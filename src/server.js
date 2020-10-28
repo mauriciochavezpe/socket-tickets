@@ -15,9 +15,6 @@ app.use(express.static(publicPath));
 
 io;
 
-
-
-
 server.listen(port, (err) => {
 
     if (err) throw new Error(err);
