@@ -33,3 +33,25 @@
     width: 10rem!important;
     height: 10rem!important;
 }
+.w-100{
+    width: 100%;
+}
+
+.ticketsAtendido{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    grid-gap: 20px;
+
+}
+.tickets-atendidos{
+    margin-top: 50px;
+}
+
+.ticket-atendido{
+    border: 1px solid;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}

@@ -1,17 +1,29 @@
 {
-    "name": "08-socket-colas",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node src/server.js"
-    },
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "axios": "^0.20.0",
-        "express": "^4.16.3",
-        "socket.io": "^2.3.0"
-    }
+  "name": "08-socket-colas",
+  "version": "1.0.0",
+  "description": "Este es un pequeño servidor de express listo para ejecutarse y servir la carpeta public en la web.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev":"nodemon src/server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "express": "^4.16.3",
+    "socket.io": "^2.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mauriciochavezpe/socket-tickets.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mauriciochavezpe/socket-tickets/issues"
+  },
+  "homepage": "https://github.com/mauriciochavezpe/socket-tickets#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
 }

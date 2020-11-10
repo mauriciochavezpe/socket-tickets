@@ -9,25 +9,32 @@ socket.on('disconnect', function () {
 })
 // emitir tickets
 
-function agregarTickets() {
+var motivo = document.getElementById("motivo");
 
-    socket.emit("ticket", {
-        // mensaje: `Ticket `,
-        createAt: new Date().toISOString(),
-        "motivo": document.getElementById("motivo").value
-    }, function (res) {
-        console.log("mensaje recibido", res);
-        listarTickets();
-    })
+motivo.addEventListener("keypress", agregarTickets);
+function agregarTickets(e) {
+    var motivo = document.getElementById("motivo").value;
+   
+    if ( e == undefined||e.keyCode == 13 ) {
+        if (motivo.length >= 1) {
+            socket.emit("ticket", {
+                createAt: new Date().toISOString(),
+                motivo: motivo
+            }, function (res) {
+                console.log("mensaje recibido", res);
+                listarTickets();
+            })
+        }
+    }
+
 }
 // seleccionar un tickets y cambiar el estado y actualiza la lista
 // listar tickets
-socket.on('tomarTickets', tickets = {}, (res) => {
-    console.log(res)
-})
+
 const tomarticket = (e) => {
     console.log(e);
     var id = e.parentElement.parentElement.id;
+    console.log(id);
     socket.emit('tomarTickets', {
         id
     }, (res) => {
@@ -35,8 +42,8 @@ const tomarticket = (e) => {
     })
 
 }
-socket.on('listaTickets', (res) => {
-
+socket.on('listaTickets', (tickets) => {
+    // console.log(res);
     document.getElementById("preload").classList.remove("d-none")
 
     document.getElementById("preload").display = 'inline-flex';
@@ -44,57 +51,39 @@ socket.on('listaTickets', (res) => {
 
     var box = document.getElementById("boxlist");
 
-
-    // console.log(data);
-    console.log("la lista", res)
-    // res.tickets
     var ul = document.createElement("ul");
-    for (let i = 0; i < res.tickets.length; i++) {
+    for (let i = 0; i < tickets.length; i++) {
         var li = document.createElement("li");
-        li.setAttribute("id", res.tickets[i].id);
+        li.setAttribute("id", tickets[i].id);
         li.setAttribute("class", "list-group-item");
-        let icono = res.tickets[i].estado === 'Espera' ? '<i  style="color:red" class="fa fa-clock-o" aria-hidden="true"></i>' : '<i style="color:green" class="fa fa-check-circle-o" aria-hidden="true"></i>';
-        li.innerHTML = `<div class="ticket"><div>${res.tickets[i].motivo}</div><button class="btn" onclick="tomarticket(this)" ${res.tickets[i].estado =='Espera'?'':'disabled'}>${icono}</button></div>`;
+        let icono = tickets[i].estado === 'Espera' ? '<i  style="color:red" class="fa fa-clock-o" aria-hidden="true"></i>' : '<i style="color:green" class="fa fa-check-circle-o" aria-hidden="true"></i>';
+        li.innerHTML = `<div class="ticket"><div>${tickets[i].motivo}</div><button class="btn" onclick="tomarticket(this)" ${tickets[i].estado == 'Espera' ? '' : 'disabled'}>${icono}</button></div>`;
 
-        // li.setAttribute("id",res.tickets[i].id);
         ul.setAttribute("class", "list-group");
         ul.appendChild(li)
     }
     box.appendChild(ul);
     document.getElementById("preload").classList.add("d-none");
 
-    
+
     document.getElementById("motivo").value = "";
 })
-// listar tickets
-const listarTickets = () => {
-    document.getElementById("preload").classList.remove("d-none")
 
-    document.getElementById("preload").display = 'inline-flex';
-    document.getElementById("boxlist").innerHTML = null;
+socket.on('listaTicketsAtendidos', (tickets) => {
+   
+    var listTicket = document.getElementById("ticketsAtendidos");
+    listTicket.innerHTML = null;
 
-    var box = document.getElementById("boxlist");
+    var div = document.createElement("div");
+    div.classList.add("ticketsAtendido");
+    for (let i = 0; i < tickets.length; i++) {
+        let d = document.createElement("div");
+        d.classList.add("ticket-atendido");
+        var strong = document.createElement("strong");
+        strong.innerText = `${tickets[i].motivo} - ${tickets[i].estado}`;
+        d.appendChild(strong);
 
-    socket.on('listaTickets', (res) => {
-        console.log("la lista", res)
-        // res.tickets
-        var ul = document.createElement("ul");
-        for (let i = 0; i < res.tickets.length; i++) {
-            var li = document.createElement("li");
-            li.setAttribute("id", res.tickets[i].id);
-            li.setAttribute("class", "list-group-item");
-            let icono = res.tickets[i].estado === 'Espera' ? '<i  style="color:red" class="fa fa-clock-o" aria-hidden="true"></i>' : '<i style="color:green" class="fa fa-check-circle-o" aria-hidden="true"></i>';
-            li.innerHTML = `<div class="ticket"><div>${res.tickets[i].motivo}</div><button class="btn" onclick="tomarticket(this)" ${res.tickets[i].estado =='Espera'?'':'disabled'}>${icono}</button></div>`;
-
-            // li.setAttribute("id",res.tickets[i].id);
-            ul.setAttribute("class", "list-group");
-            ul.appendChild(li)
-        }
-        box.appendChild(ul);
-        document.getElementById("preload").classList.add("d-none");
-    })
-    document.getElementById("motivo").value = "";
-}
-// socket.on("ticket", function (res) {
-//     console.log("mensaje recibido", res);
-// })
+        div.appendChild(d);
+    }
+    listTicket.appendChild(div);
+})

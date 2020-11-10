@@ -1,49 +1,48 @@
 const socketIO = require('socket.io');
 const dbTickets = require('../json/db.json');
 const fs = require('fs');
+var TicketCola = require('../classes/TicketsCola');
 
-dbTickets.fecha = new Date().getDate();
+// dbTickets.fecha = new Date().getDate();
 
+var ticketCola = new TicketCola();
+// console.log(ticketCola.listTicket().length);
+// console.log(ticketCola.getUltimos4().length);
 
 const socket = (server) => {
     const io = socketIO(server);
     io.on('connection', (client) => {
-        // dbTickets.tickets
-        client.emit('listaTickets',dbTickets);
+
+        client.emit('listaTickets', ticketCola.listTicket());
+        client.emit('listaTicketsAtendidos', ticketCola.getUltimos4());
+
 
         client.on('disconnect', () => {
             console.log(`Usuario desconectado`);
         })
         // listening(name,body,callback) 
-        client.on('ticket', (msg, callback) => {
+        client.on('ticket', (msg, callback) => {    
 
-            (dbTickets.tickets.length === 0) ? msg.id = 1: msg.id = dbTickets.tickets[dbTickets.tickets.length - 1].id + 1;
-            msg.estado = "Espera"
+            msg.id = ticketCola.getId();
 
-            dbTickets.tickets.push(msg);
-            fs.writeFileSync(__dirname + "./../json/db.json", JSON.stringify(dbTickets))
-            callback({
-                menssage: `Ticket # ${msg.id}`
-            })
-            
-            // client.broadcast.emit("mensaje", msg);
+            var estado = ticketCola.save(msg);
+
+            if (estado != null || estado != undefined) {
+                client.broadcast.emit("listaTickets", dbTickets);
+            }
 
         })
         // cambia el estado del ticket
-        client.on('tomarTickets', (__tickets, callback) => {
-            console.log(__tickets)
-            dbTickets.tickets.filter((ticket) => {
-                console.log(ticket.id)
-                if (ticket.id == Number(__tickets.id)) {
-                    console.log(ticket);
-                    ticket.estado = "Atendido"
-                 
-                }
-            })
+        client.on('tomarTickets', (ticket, callback) => {
+    
+            var ticketCola = new TicketCola();
+            ticketCola.update(ticket);
 
+            client.broadcast.emit("listaTickets", dbTickets);
+           
         })
 
-       
+
     })
 }
 
